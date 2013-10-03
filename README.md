@@ -47,4 +47,4 @@ counter.add(5).await();                // call add(), wait until message has bee
 System.out.println("Result: "+counter.getCount().get());  // will print 6
 ```
 
-You can find the original documentation <a href="timjansen.github.io/actorsguild/">here</a>.
+You can find the original documentation <a href="http://timjansen.github.io/actorsguild/">here</a>.
