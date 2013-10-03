@@ -2,8 +2,8 @@ Actor's Guild
 ==============
 
 Actors Guild was an experimental Java framework to make concurrent programming easier. 
-It combined the concept of Actors with Futures. The result is a small API that let's you write concurrent, 
-multi-threaded code almost like regular Java classes.
+It combined the concept of Actors with Futures. The result was a small API that lets you write concurrent, 
+multi-threaded code almost like regular Java classes. 
 
 While the concept was interesting, in order to put it into practical use a huge amount of infrastructure would 
 have been required. It is not really possible to combine AG with, say, Spring. Most libraries do not provide
