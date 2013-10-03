@@ -1,0 +1,27 @@
+K 26
+svn:wc:ra_dav:activity-url
+V 14
+/svn/!svn/act/
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/53/trunk/actorsguildframework/main/dist
+END
+ant.xml
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/76/trunk/actorsguildframework/main/dist/ant.xml
+END
+CHANGES.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/76/trunk/actorsguildframework/main/dist/CHANGES.txt
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/76/trunk/actorsguildframework/main/dist/README.txt
+END

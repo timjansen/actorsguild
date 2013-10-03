@@ -1,0 +1,7 @@
+This directory contains dependencies of the Actors Guild library 
+which are not necessarily part of the distribution (they may be needed
+for building and testing only.
+
+Please note that the Actors Guild license does not apply for the content
+of this directory!!!
+ 

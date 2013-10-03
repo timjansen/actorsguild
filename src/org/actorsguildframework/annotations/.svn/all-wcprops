@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/43/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations
+END
+Model.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/68/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Model.java
+END
+Prop.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/71/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Prop.java
+END
+DefaultValue.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/64/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/DefaultValue.java
+END
+Initializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/76/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Initializer.java
+END
+Message.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/3/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Message.java
+END
+Usage.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/3/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Usage.java
+END
+Bean.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/70/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Bean.java
+END
+Shared.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/67/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/Shared.java
+END
+ThreadSafe.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/!svn/ver/72/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/ThreadSafe.java
+END
+ConcurrencyModel.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/!svn/ver/68/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/ConcurrencyModel.java
+END
+ThreadUsage.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/43/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/ThreadUsage.java
+END
+package.html
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/18/trunk/actorsguildframework/main/src/org/actorsguildframework/annotations/package.html
+END

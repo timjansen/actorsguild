@@ -1,0 +1,12 @@
+Changes
+========
+
+Version 0.6 (2009-02-06):
+- New initialization model and property support (@Prop/@DefaultValue/@Bean)
+- @Stateless classes are checked to be stateless
+- @ThreadSafe annotation required for public methods in classes
+- @Model can only be set for a class, not for single methods anymore
+
+Version 0.5 (2008-12-21):
+- first release
+

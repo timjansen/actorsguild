@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ag-distribution" default="dist" basedir=".">
+	<target name="copy">
+		<delete dir="build"/>
+		<mkdir dir="build"/>
+	
+		<jar destfile="build/ag-0.6.jar">
+			<fileset dir="../bin" casesensitive="yes">
+				<include name="org/**/*.class"/>
+				<include name="org/**/*.xml"/>
+				<include name="org/**/*.properties"/>
+				<exclude name="**/*Test.class"/>
+				<exclude name="**/*Test$*.class"/>
+				<exclude name="**/.*"/>
+			</fileset>
+
+			<manifest>
+				<attribute name="Built-By" value="Tim Jansen"/>
+				<attribute name="Implementation-Vendor" value="Tim Jansen"/>
+				<attribute name="Implementation-Title" value="Actors Guild"/>
+				<attribute name="Implementation-Version" value="0.5"/>
+			</manifest>
+		</jar>
+		
+		<zip destfile="build/ag-0.6.src.zip">
+			<zipfileset dir=".." casesensitive="yes">
+				<include name="src/**/*.*"/>
+				<include name="testSrc/**/*.*"/>
+				<exclude name="**/.*"/>
+			</zipfileset>
+		</zip>
+		
+		<copy todir="build/">
+			<fileset dir="." casesensitive="yes">
+				<include name="external-lib/**/*.*"/>
+				<exclude name="**/.*"/>
+			</fileset>
+		</copy>
+		<copy file="../lib/asm-3.1.jar" todir="build/external-lib/asm"/>
+
+		<copy todir="build/">
+			<fileset dir=".." casesensitive="yes">
+				<include name="exampleSrc/**/*.*"/>
+				<exclude name="**/.*"/>
+			</fileset>
+		</copy>
+
+		<copy file="README.txt" todir="build/"/>
+		<copy file="CHANGES.txt" todir="build/"/>
+		<copy file="../LICENSE.txt" todir="build/"/>
+    </target>
+    
+    <target name="dist" depends="copy">
+    	<zip destfile="actorsguild-0.6.zip" basedir="build"/>
+    </target>
+</project>

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/64/trunk/actorsguildframework/main/src/org/actorsguildframework/internal/codegenerator
+END
+BeanCreator.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/!svn/ver/72/trunk/actorsguildframework/main/src/org/actorsguildframework/internal/codegenerator/BeanCreator.java
+END
+ActorProxyCreator.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/!svn/ver/72/trunk/actorsguildframework/main/src/org/actorsguildframework/internal/codegenerator/ActorProxyCreator.java
+END
+GenerationUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/!svn/ver/65/trunk/actorsguildframework/main/src/org/actorsguildframework/internal/codegenerator/GenerationUtils.java
+END
+GenericTypeHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/!svn/ver/65/trunk/actorsguildframework/main/src/org/actorsguildframework/internal/codegenerator/GenericTypeHelper.java
+END
