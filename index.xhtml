@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions" xmlns:page="http://actorsguildframework.org/pageDescription" xmlns="http://www.w3.org/1999/xhtml"><head><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" type="application/rss+xml" title="Actors Guild Blog" href="http://actorsguildframework.blogspot.com/feeds/posts/default?alt=rss"/><link rel="StyleSheet" href="css/main.css" type="text/css"/><title>Actors Guild Framework</title></head><body><div id="logobar" style="overflow: hidden; position: absolute; top: 0px; left: 0px; width: 100%; height: 116px"><a href="/"><img src="images/page-logo.png" style="border: 0px; position: absolute; top: 0px; left: 0px; width: 700px; height: 116px" alt="Actors Guild"/></a><div style="background-image: url(images/page-top-bar.png); position: absolute; top: 0px; left: 700px; width: 1800px; height: 116px"><span/></div></div><div id="underlogo" style="position: absolute; top: 116px; left: 0px; width: 100%"><div id="middle"><div class="menu" style="float:left; margin-left: 0px; margin-top: 5px; overflow: hidden; width: 152px; height: 400px"><div class="menuSelected">Home</div><div><a href="/download.xhtml">Download</a></div><div><a href="/tutorial.xhtml">Tutorial</a></div><div><a href="/documentation.xhtml">Documentation</a></div><div><a href="http://actorsguildframework.blogspot.com/">Blog</a></div><div><a href="http://code.google.com/p/actorsguildframework/w/list">Wiki</a></div><div><a href="http://code.google.com/p/actorsguildframework/">Google Code</a></div></div><div id="bar" style="float:left; overflow: hidden; width: 2px; height: 400px; margin-top: 5px; margin-left: 2px; background-color: black"><span/></div><div id="main" style="float:left; margin-left: 20px; margin-top: 20px; width: 640px">
+		<h2>About Actors Guild</h2>
+		<p>
+		Actors Guild is an experimental 
+		<a href="http://en.wikipedia.org/wiki/Java_(programming_language)">Java</a> 
+		framework to make concurrent programming easier. It combines the concept of 
+		<a href="http://en.wikipedia.org/wiki/Actor_model">Actors</a> with 
+		<a href="http://en.wikipedia.org/wiki/Futures_and_promises">Futures</a>. 
+		The result is a small API that let's you write concurrent, multi-threaded code 
+		almost like regular Java classes.
+		</p>
+		<hr/>
+		<h2>News</h2>
+		<span class="miniHead">2010/02/23: Actors Guild is dead (probably)</span><br/>
+		<p>As you should have noticed, there has been no progress on AG in the last 6 months. 
+		The reason is simply that AG did not achieve what I had hoped, and I have gone on to pursue other things. 
+		</p>
+		<p>If you consider using AG in a project, you should be aware that it's unlikely that there will be any further development.
+		</p>
+		<p>My current pet project is <a href="http://jarfiller.com">Jarfiller.com</a>, a collection of very dense references and tutorials for Java developers. 
+		</p>
+		<span class="miniHead">2009/02/06: Actors Guild 0.6 released!</span><br/>
+		<p>Version 0.6 of the Actors Guild Framework is <a href="http://code.google.com/p/actorsguildframework/downloads/list">now available</a>. The focus of this release was to improve the API, simplify some features like the <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Model.html">@Model</a> annotation, and make it more difficult to write incorrect actors. Here is a list of the most important changes:
+		</p>
+		<ul><li>Property-based initialization (<a href="http://actorsguildframework.blogspot.com/2009/01/ag-06s-new-property-based.html">read more about it here</a>)</li><li><a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/ConcurrencyModel.html#Stateless">Stateless</a> classes will now be verified at runtime</li><li>For public non-@Message methods in actors the annotation <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/ThreadSafe.html">ThreadSafe</a> is now required</li><li>The <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Model.html">Model</a> annotation can only be used for whole actors, not for single messages anymore</li></ul>
+		<p>As always, it would be great to get feedback of any kind! <br/>
+		The focus of the next release will be performance. I hope to improve the performance of the scheduler, and will introduce a much faster way of copying Serializable message arguments.
+		</p>
+		<span class="miniHead">2008/12/21: First release (0.5)</span><br/>
+		<p>I just released the first version of the Actors Guild Framework! 
+		Version 0.5 is <a href="http://code.google.com/p/actorsguildframework/downloads/list">ready
+		for download</a>. You can also visit the new 
+		<a href="http://actorsguildframework.org">site</a> and read 
+		the <a href="http://actorsguildframework.org/tutorial.xhtml">tutorial</a>.</p>
+
+		<p>Version 0.5 contains all the main features that I want to have in version 1.0. Still, 
+		please note that it is experimental software. There may be backward-incompatible 
+		changes in the API, in particular in the way actors 
+		are <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Initializer.html">initialized</a>. 
+		I would appreciate any feedback, especially concerning the API and how to make it 
+		even easier to use.</p>
+
+		<p>This is my current to-do list for version 1.0:</p>
+		<ul><li>support for dependency-injection in Actors</li><li><a href="http://springframework.org">Spring</a> support</li><li>run-time checks at the bytecode level to enforce the rules for <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/ConcurrencyModel.html#Stateless">Stateless</a> messages
+		</li><li>faster copying of mutable (Serializable) message arguments
+		</li></ul>
+
+		<p>I hope that you give give Actors Guild a try, and please leave some feedback either here on the blog, or 
+		write to tim@actorsguildframework.org. Thanks!</p>
+
+		
+		<div style="text-align: right"><a href="http://actorsguildframework.blogspot.com/">More news...</a></div> 
+		<hr/>
+		<h2>Some Code</h2>
+		If you know how <a href="http://en.wikipedia.org/wiki/Actor_model">actors</a> work,
+		and maybe know some of the other Actor-based frameworks for Java 
+		(such as <a href="http://code.google.com/p/jetlang/">Jetlang</a> and
+		<a href="http://www.malhar.net/sriram/kilim/index.html">Kilim</a>), 
+		here is some example code to give you a rough idea of how to use Actors Guild:
+		<pre>abstract class Counter extends Actor
+{
+    private int count;
+    @Prop abstract int getInitialCount();
+
+    @Initializer
+    public void init() {
+        count = getInitialCount();
+    }
+
+    @Message
+    public AsyncResult&lt;Integer&gt; getCount() {
+        return result(count);
+    }
+
+    @Message
+    public AsyncResult&lt;Void&gt; add(int a) {
+        count = count + a;
+        return noResult();
+    }   
+}</pre>
+<p>Creating the actor and using its messages: </p>
+<pre>Agent agent = new DefaultAgent(); // the Agent manages Actors
+Counter counter = agent.create(Counter.class, new Props("initialCount", 1));
+counter.add(5).await();           // call add(), wait until message has been processed
+System.out.println("Result: "+counter.getCount().get());  // will print 6</pre>
+  
+  		<p>In other words, it is very different from typical actor libraries. You don't have to implement a message loop. 
+  		The framework will manage the actor's message queue for you. You only need to implement the messages as annotated methods
+  		with a special return type.  
+  		</p>
+  		<p>
+		You can learn more about Actors Guild in the <a href="/tutorial.xhtml">tutorial</a>.
+		</p>
+	<div id="footer" style="font-size: smaller; margin-top: 100px">
+				Last update: 
+				2010-2-24
+		 		- 
+				<a href="/imprint.xhtml">Imprint</a></div></div></div></div></body></html>

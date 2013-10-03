@@ -1,0 +1,13 @@
+body { font-family: sans-serif; font-size: small }
+
+.menu > div { margin-top: 6px; margin-bottom: 6px; padding: 3px 3px 3px 8px }
+.menu > div > a {color: black}
+.menuSelected { background-color: #24d126; color: white }
+
+.miniHead {font-weight: bold}
+.miniSection {margin-bottom: 20px}
+
+pre { border-left:3px solid #CCCCCC; margin-left: 10px; padding-left: 15px}
+.codeError { color: red }
+.codeEm { background-color: #44ff44 }
+.code { font-family: monospace }

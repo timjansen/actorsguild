@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions" xmlns:page="http://actorsguildframework.org/pageDescription" xmlns="http://www.w3.org/1999/xhtml"><head><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="StyleSheet" href="css/main.css" type="text/css"/><title>AG - Tutorial</title></head><body><div id="logobar" style="overflow: hidden; position: absolute; top: 0px; left: 0px; width: 100%; height: 116px"><a href="/"><img src="images/page-logo.png" style="border: 0px; position: absolute; top: 0px; left: 0px; width: 700px; height: 116px" alt="Actors Guild"/></a><div style="background-image: url(images/page-top-bar.png); position: absolute; top: 0px; left: 700px; width: 1800px; height: 116px"><span/></div></div><div id="underlogo" style="position: absolute; top: 116px; left: 0px; width: 100%"><div id="middle"><div class="menu" style="float:left; margin-left: 0px; margin-top: 5px; overflow: hidden; width: 152px; height: 400px"><div><a href="/">Home</a></div><div><a href="/download.xhtml">Download</a></div><div class="menuSelected">Tutorial</div><div><a href="/documentation.xhtml">Documentation</a></div><div><a href="http://actorsguildframework.blogspot.com/">Blog</a></div><div><a href="http://code.google.com/p/actorsguildframework/w/list">Wiki</a></div><div><a href="http://code.google.com/p/actorsguildframework/">Google Code</a></div></div><div id="bar" style="float:left; overflow: hidden; width: 2px; height: 400px; margin-top: 5px; margin-left: 2px; background-color: black"><span/></div><div id="main" style="float:left; margin-left: 20px; margin-top: 20px; width: 640px">
+<h1>Tutorial</h1>
+<span style="font-size: smaller">Updated 2009-02-06 for Actors Guild version 0.6</span>
+<h2>1. Overview</h2>
+<p>
+	New CPUs have mostly stopped getting faster at executing instructions. 
+	Instead new CPUs have gained the ability to execute 
+	several <a href="http://en.wikipedia.org/wiki/Thread_(computer_science)">threads</a> of 
+	execution simultaneously, as if you had several CPUs in your computer that all share the same memory. 
+	Unfortunately taking advantage of these systems is difficult. Not only do you have to design your 
+	application to distribute the work into several simultaneously running threads. It is also surprisingly complicated 
+	to coordinate the simultaneous access to memory and other common resources, even in a language that has 
+	built-in design for threads such as <a href="http://en.wikipedia.org/wiki/Java">Java</a>. The framework 
+	that this tutorial will show you offers a simple way of writing multi-threaded applications.
+</p><p>
+	Actors Guild is a concurrency framework for Java that is loosely based on 
+	the <a href="http://en.wikipedia.org/wiki/Actor_model">Actor model</a>. Actors are a special kind of 
+	object that do their work by sending and receiving messages. An actor can process only one message 
+	at a time and does not share any mutable data with other actors. Data is always owned by exactly one 
+	actor. Other actors can only access it indirectly, by exchanging messages with the owner. Thus, when you 
+	write an actor, you don't have to deal with all the problems that come with concurrency, like 
+	the need for synchronization. You write only single-threaded Actors which have to follow some relatively 
+	simple rules.
+</p><p>
+	What makes the Actor model a concurrency model is that several actors can run, and thus process 
+	messages, at the same time. The Actors Guild framework will take care of things such as message 
+	dispatching, managing threads and memory synchronization for you.
+</p><p>
+	One major difference between Actors Guild and other Actor-based frameworks is that you implement 
+	messages as Java methods. You can send a message just like calling a Java method. Actors 
+	Guild does not need any preprocessor, special compiler or other tools for this. You only need follow 
+	a few simple rules for the method's signature. All the other magic is done invisibly at run-time.
+</p><p>
+	Because Java methods usually return a value, Actors Guild always uses a request/response pattern 
+	for messages. This is different from 'normal' actor-based systems. When you invoke an actor's 
+	message method, you will send a message to the actor and then you receive a message as reply. But 
+	for you it looks like invoking a method, albeit with an somewhat unusual return type.
+</p><p>
+	In order to make use of several CPU cores, the trick is to design your program in a way that lets 
+	several Actors work in parallel. You do so by sending more than one message before you process the 
+	results. Or, with the right design, design your interfaces in a way that you don't need to process 
+	the results at all and have a completely asynchronous program.
+</p>
+
+<h2>2. How to Write an Actor</h2>
+<h3>Extend Actor</h3>
+<p>
+	To create a new actor without any messages, just create a class that extends from the abstract 
+	class Actor:
+</p>
+<pre>class MyFirstActor extends Actor
+{
+}
+</pre>
+<p>
+	That's it. However, the initialization of actors is different than the normal Java costructor
+</p>
+
+<h3>Do Not Write a Constructor! (Use Properties Instead)</h3>
+<p>
+	Actors should not have a constructor. Any configuration of the actor is done using properties. 
+	Actors Guild has some annotations to support property-based initialization, but they will be shown later.
+</p>
+
+
+
+<h2>3. How To Write A Message Handler</h2>
+<p>
+	A message handler is a Java method that fulfills three conditions:
+</p>
+<ol>
+<li>It has a <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Message.html">@Message</a> annotation.</li>
+<li>Its return value is wrapped in a AsyncResult object.</li>
+<li>All arguments and the return values must be serializable (exception: the <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Shared.html">@Shared</a> annotation).</li>
+</ol>
+
+<h3>The @Message Annotation</h3>
+<p>
+	The following example shows a simple actor with two messages that implements a counter. 
+	The messages allow you to add a number to the counter and to retrieve its current value.  
+	Both messages will automatically work correctly, even when accessed by several threads 
+	simultaneously, because the framework processes only one message at a time.
+</p>
+<pre>class Counter extends Actor
+{
+    private int count;
+
+    @Message
+    public AsyncResult&lt;Integer&gt; getCount() {
+        return result(count);
+    }
+
+    @Message
+    public AsyncResult&lt;Void&gt; add(int a) {
+        count = count + a;
+        return noResult();
+    }   
+}
+</pre>
+
+
+<h3>The AsyncResult Return Type</h3>
+<p>
+	Every message must return 
+	an <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/AsyncResult.html">AsyncResult</a> 
+	value. From the perspective of the message implementation, <span class="code">AsyncResult</span> is just a wrapper for the return value. The generic type of the <span class="code">AsyncResult</span> is the actual return type. Methods that do not return a value should use '<span class="code">AsyncResult&lt;Void&gt;</span>'. The reasons why need to use <span class="code">AsyncResult</span> will be explained later when we show how to send a message.
+</p><p>
+	Message implementations will usually just use the convenience methods 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Actor.html#result(T)">result()</a> 
+	and 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Actor.html#noResult()">noResult()</a>
+	to obtain an <span class="code">AsyncResult</span> that wraps the actual result. Both methods create 
+	a new instance of 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/ImmediateResult.html">ImmediateResult</a>
+	and return it. <span class="code">ImmediateResult</span> is a very simple implementation 
+	of the <span class="code">AsyncResult</span> interface which does nothing but store the value.
+</p>
+
+<h3>Message Argument And Return Value Types</h3>
+<p>
+	The declared arguments of a message, as well as the return value wrapped in 
+	the <span class="code">AsyncResult</span>, must either be 
+	<a href="http://java.sun.com/javase/6/docs/api/java/io/Serializable.html">serializable</a>
+	types, actors or interfaces. Serializable are all primitives (<span class="code">int</span>, 
+	<span class="code">boolean</span> etc), Strings, all classes implementing 
+	<span class="code">Serializable</span> as well as arrays of serializable types.
+</p><p>
+	Because of Java's memory model, sharing mutable types between threads is hardly 
+	possible without error-prone synchronization. Thus the values have to be copied 
+	using the serialization mechanism, which is relatively slow. You can improve 
+	performance by using types that Actors Guild recognizes 
+	as immutable types. Immutable values can be shared and thus passed by reference. The 
+	primitive types, their wrapper classes and the <span class="code">String</span> class
+	will be automatically treated as immutable. If you want to pass your own types to an Actor 
+	method, you should consider designing it as an immutable type and implementing the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Immutable.html">Immutable</a> 
+	interface.
+</p>
+<p>
+	There is one exception to the rule above: you can use the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Shared.html">@Shared</a>
+	annotation for a parameter to pass a reference to any object. This object will be shared between
+	the caller and the called method, and must thus be multi-threading safe. Sometimes this is needed to 
+	use existing Java APIs, but otherwise sharing is discouraged.
+</p>
+
+<h2>4. How to Create an Actor</h2>
+<h3>Obtain an Agent</h3>
+<p>
+	In order to create an actor, you need to create an 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Agent.html">Agent</a>
+	first. The agent is responsible for creating and managing actors. It will also manage common 
+	resources for the actors, such as threads.
+</p><p>
+	The default implementation of the Agent interface is the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/DefaultAgent.html">DefaultAgent</a>
+	class. In most cases you can just create it using the default constructor. The other constructor
+	variants allow you to configure options such as the number of threads in the agent's pool.
+</p>
+<p>
+	Creating the agent:
+</p>
+<pre>Agent agent = new DefaultAgent();
+</pre>
+<p>
+	If you are implementing an actor and need to get a reference to the actor's agent, 
+	for example to create a new actor, call the Actor's 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Actor.html#getAgent()">getAgent</a> 
+	method.
+</p>
+
+<h3>Create the Actor</h3>
+<p>
+	Now that we have an agent instance, we can use it to create the Actor. Our Counter 
+	actor can be created like this:
+</p>
+<pre>Agent agent = new DefaultAgent();
+Counter counter = agent.create(Counter.class);
+</pre>
+<p>
+	Please note that the returned class is not the Counter class itself, but a 
+	proxy class created by the framework that extends Counter. The proxy class is responsible 
+	for most of Actors Guild's functionality.
+</p>
+
+<h2>5. How to Send a message</h2>
+<h3>Queuing the Message</h3>
+<p>
+	If you have a reference, you can send a message to the actor by invoking the 
+	message's method. This will cause the message to be queued by the agent. As soon 
+	as there is a spare thread and the actor is not busy, the agent will let the Actor 
+	execute the message.
+</p>
+<pre>Agent agent = new DefaultAgent();
+Counter counter = agent.create(Counter.class);
+
+counter.add(10); // Queues a message (will be executed later!!)
+</pre>
+
+<h3>Waiting for Messages</h3>
+<p>
+	When you only queue a message, you don't know when the message has been processed. In 
+	fact, it may happen that the message is never being processed. Actors Guild's only 
+	promise is that messages will be processed in the order they have been queued. So 
+	if you need to be sure that the message has been processed at a certain time, 
+	you need to wait for it.
+</p><p>
+	In order to wait for a message you need the AsyncResult interface returned by the message
+	methods. In the previous chapter it has been said that message implementation just uses 
+	AsyncResult as a result wrapper, and that's true for the implementation side. The caller, 
+	however, will retrieve a different implementation of AsyncResult. This AsyncResult 
+	implementation can notify you when a message completed, allows you to wait for a message 
+	to complete and to retrieve the result.
+</p><p>
+	To wait for a single message to be completed, just call the method 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/AsyncResult.html#await()">await</a>
+	of the AsyncResult:
+</p>
+<pre>Agent agent = new DefaultAgent();
+Counter counter = agent.create(Counter.class);
+
+counter.add(10)<span class="codeEm">.await()</span>; // Queues a message and waits for its completion
+</pre>
+
+<h3>Retrieving Results</h3>
+<p>
+	Message implementations can provide you with a return value, and this return value can be 
+	retrieved from the AsyncResult using the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/AsyncResult.html#get()">get</a>
+	method. <span class="code">Get</span> will wait for the message to be processed 
+	(just like <span class="code">awake</span>) and then return the result that has been 
+	wrapped by the implementation:
+</p>
+<pre>Agent agent = new DefaultAgent();
+Counter counter = agent.create(Counter.class);
+
+counter.add(10).await() // Queues a message and waits for its completion
+System.out.println("Counter value = " + <span class="codeEm">counter.getCount().get()</span>);
+</pre>
+<p>
+	Please note that the await() for the <span class="code">add</span> operation is 
+	optional. Messages will be processed in the order in which they have been queued, 
+	so <span class="code">add</span> will always be executed before 
+	<span class="code">getCount</span>.
+</p>
+<p>
+	<span class="code">Get</span> will not only return results. If the message implementation 
+	threw an exception, it will be rethrown by <span class="code">get</span>, wrapped in a 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/WrappedException.html">WrappedException</a>.
+</p>
+
+<h3>Don't Wait For Yourself!</h3>
+<p>
+	There's a common trap when writing an Actor: you can deadlock it by sending a 
+	message to itself and then wait for it:
+</p>
+<pre>class DeadlockActor extends Actor
+{
+    @Message
+    public AsyncResult&lt;Void&gt; a() {
+        return noResult();
+    }
+
+    @Message
+    public AsyncResult&lt;Void&gt; b() {
+        <span class="codeError">a().get();   // DEADLOCK</span>
+        return noResult();
+    }   
+}
+</pre>
+<p>
+	You don't do this: the messages <span class="code">a</span> and 
+	<span class="code">b</span> can not run simultaneously. Thus if 
+	<span class="code">b</span> calls <span class="code">a</span> and then waits 
+	until <span class="code">a</span> is finished, it will never return.
+</p>
+<p>
+	There are two ways to prevent this: either you move the functionality 
+	of <span class="code">a</span> into a private, non-message method that can be 
+	called by both <span class="code">a</span> and <span class="code">b</span>. Or, 
+	if need to you wait for <span class="code">a</span> at the end 
+	of <span class="code">b</span>, you can also return the AsyncResult 
+	of <span class="code">a</span>:
+</p>
+<pre>class NoDeadlockActor extends Actor
+{
+    @Message
+    public AsyncResult&lt;Void&gt; a() {
+        return noResult();
+    }
+
+    @Message
+    public AsyncResult&lt;Void&gt; b() {
+        <span class="codeEm">return a()</span>;
+    }   
+}
+</pre>
+
+
+
+<h2>6. How to Make Concurrent Calls</h2>
+<p>
+	In Actors Guild, concurrency is achieved by processing several messages simultaneously. As 
+	an actor can only process one message at a time, this means that you need to have several 
+	actor instances that can work in parallel (there is an exception to this rule, but this will 
+	be shown later). Much of the art of writing a fast, concurrent application with Actors Guild is 
+	designing your application to have several actors work in parallel on the same problem.
+</p><p>
+	The following example shows you how to create two Counter instances and let the 
+	process <span class="code">add</span> in parallel (admittedly, <span class="code">add</span> is 
+	so fast that the overhead of sending a message is higher by orders of magnitude, but it's just 
+	an example):
+</p>
+<pre>Agent agent = new DefaultAgent();
+Counter counter1 = agent.create(Counter.class);
+Counter counter2 = agent.create(Counter.class);
+  
+AsyncResult&lt;Void&gt; ar1, ar2;
+ar1 = counter1.add(2);
+ar2 = counter2.add(5);
+
+<span class="codeEm">agent.awaitAll(ar1, ar2);</span> // wait for both messages to finish
+</pre>
+<p>
+	The method <span class="code">awaitAll</span> blocks until the messages of all 
+	AsyncResult handles have been processed. Alternatively you could also call 
+	<span class="code">await</span> on every <span class="code">AsyncResult</span>
+	separately, but <span class="code">awaitAll</span> allows some optimizations in 
+	the framework.
+</p>
+
+<h2>7. How to Initialize an Actor with Properties</h2>
+<p>
+	Actors Guild uses <a href="http://en.wikipedia.org/wiki/Dependency_injection">Dependency Injection</a>
+	initialization instead of constructors. You can define standard Java properties and then 
+	pass values for them in 
+	the <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Agent.html#create(java.lang.Class,org.actorsguildframework.Props)">Agent.create()</a>
+	invocation. After setting them, <span class="code">create</span> will invoke all methods in the actor that have
+	the <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Initializer.html">@Initializer</a>
+	annotation. You can use the <span class="code">@Initializer</span> to initialize any properties and fields that depend on other properties, as well as
+	for checking the validity of injected properties. 
+</p> 
+<p>
+	The following example extends the Counter class with a property for the initial 
+	count. The initializer methods writes the initial value into the <span class="code">count</span> variable:
+</p>
+<pre>class InitializedCounter extends Actor
+{
+    private int initialCount;
+    private int count;
+
+	@Initializer
+	void init() {
+		count = initialCount;
+	}
+
+	public void setInitialCount(int initialCount) {
+		this.initialCount = initialCount;
+	}
+
+	public int getInitialCount() {
+		return this.initialCount;
+	}
+
+    @Message
+    public AsyncResult&lt;Integer&gt; getCount() {
+        return result(count);
+    }
+
+	@Message
+	public AsyncResult&lt;Void&gt; add(int a) {
+		count = count + a;
+		return noResult();
+	}   
+}
+</pre>
+<p>
+	The InitializedCounter actor can be created like this:
+</p>
+<pre>Agent agent = new DefaultAgent();
+InitializedCounter counter = agent.create(InitializedCounter.class, <span class="codeEm">new Props("initialCount", 5)</span>);
+</pre>
+<p>
+The second argument of <span class="code">create</span> specifies one or more properties that will be set during the construction
+of the class. After the constructor finished, the <span class="code">@Initializer</span> method <span class="code">init</span> will be called and can do
+additional initialization.
+</p>
+
+<h2>10. @Prop, @DefaultValue and @Bean Annotations</h2>
+<p>
+	Writing Java properties the regular way, like in the previous chapter, does not only create a lot of redundant
+	code, it also has two additional problems in actors:
+</p>
+	<ul>
+	<li>You can not define <span class="code">final</span> read-only properties, because 'final' fields can only be written in the Java constructor. Actor
+	constructors can not get any arguments.</li>
+	<li>Regular Java properties, like IDEs usually generate them, are not thread-safe. Properties need either a 
+	<span class="code">volatile</span> in the field or a <span class="code">synchronized</span> statement in the accessors,
+	otherwise they can not be safely called from other actors.</li>
+	</ul>
+<p>
+	Actors Guild solves these problems with the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Prop.html">@Prop</a>
+	annotation. You can write abstract getter and setters, annotate the getter with @Prop, and 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Agent.html#create(java.lang.Class,org.actorsguildframework.Props)">Agent.create()</a>
+	will implement the methods for you. The generated code uses synchronization by default, so the properties are thread-safe. If you
+	omit the setter, you create a <span class="code">final</span> read-only property. The following example re-implements the
+	InitializedCounter example with <span class="code">@Prop</span>, making <span class="code">initialCount</span> read-only and implementing a 
+	property for the <span class="code">count</span> field as well:
+</p>
+<pre><span class="codeEm">abstract</span> class InitializedCounter2 extends Actor
+{
+   	@Initializer
+	void init() {
+		setCount(getInitialCount());
+	}
+
+	<span class="codeEm">@Prop</span>
+	public abstract int getInitialCount();
+
+	<span class="codeEm">@Prop</span>
+	public abstract int getCount();
+	public abstract void setCount(int count);
+
+	@Message
+	public AsyncResult&lt;Void&gt; add(int a) {
+		setCount(getCount() + a);
+		return noResult();
+	}   
+}
+</pre>
+<p>
+	By default, <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Agent.html#create(java.lang.Class,org.actorsguildframework.Props)">Agent.create()</a>
+	initializes unspecified properties to their default value (0 for numbers, null for references). If you want a different default value
+	for a property, define a <span class="code">static final</span> field of the same type and declare it as default 
+	using the <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/DefaultValue.html">@DefaultValue</a>
+	annotation. This is the InitializedCounter2 example with a default value of 100 for the counter:
+</p>
+<pre>abstract class InitializedCounter3 extends Actor
+{
+	<span class="codeEm">@DefaultValue("initialCount")</span>
+	final static int DEFAULT_INITIAL_COUNT = 100;
+
+   	@Initializer
+	void init() {
+		setCount(getInitialCount());
+	}
+
+	@Prop
+	public abstract int getInitialCount();
+
+	@Prop
+	public abstract int getCount();
+	public abstract void setCount(int count);
+
+	@Message
+	public AsyncResult&lt;Void&gt; add(int a) {
+		setCount(getCount() + a);
+		return noResult();
+	}
+}
+</pre>
+<p>
+	The @Prop, @Initializer and @DefaultValue annotations are not limited to actors. In fact, you can use them in any class as long as 
+	it has a constructor without arguments and a <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Bean.html">Bean</a>
+	annotation. 
+	Here is a simple bean that uses <code>@Prop</code> for three read-only properties:
+</p>
+<pre><span class="codeEm">@Bean(threadSafe=false)</span>
+abstract class Book
+{
+	@Prop
+	public abstract String getTitle();
+	@Prop
+	public abstract String getAuthor();
+	@Prop
+	public abstract int getReleaseYear();
+}
+</pre>
+<p>
+	The mandatory <code>threadSafe</code> parameter in <code>@Bean</code> specifies whether the generated property accessors
+	will be synchronized and thus thread-safe, or not. 
+</p>
+<p>
+	<code>@Beans</code> must be created with <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Agent.html#create(java.lang.Class,org.actorsguildframework.Props)">Agent.create()</a>
+	as well. This snippet creates a new Book instance:
+</p>
+<pre>Agent agent = new DefaultAgent();
+Book book = agent.create(Book.class, new Props("title", "The C Programming Language")
+			.add("author", "Brian Kernighan and Dennis Ritchie")
+			.add("releaseYear", 1978));
+</pre>
+
+<h2>9. Thread @Usage Annotations</h2>
+<p>
+	In order to process messages, the Agent uses a thread pool with a limited number of 
+	threads. Parameters like the size of the pool can be configured in the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/DefaultAgent.html">Agent's implementation</a>. 
+	The disadvantage this automatic thread management is that it is optimized for the 
+	execution of CPU-bound tasks. Usually the agent uses not more than two threads per CPU 
+	core. This becomes a problem when the thread is not used for 
+	computation and data processing, but rather for I/O-bound tasks or waiting for external 
+	input, such as from the network or the user. In these case there can be and should be 
+	more than one thread per CPU core, as the threads are mostly idle. So how can the agent 
+	know about it?
+</p><p>
+	In order to tell the agent how a message is using its CPU time, there's an annotation 
+	called <a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Usage.html">@Usage</a>. 
+	By default, the agent assumes that the message is using the full CPU time. In that case 
+	you do not need the annotation. But if the message is mostly I/O bound, it should be 
+	declared with <span class="code">@Usage(ThreadUsage.IO)</span>. Similarly, messages 
+	that are waiting for some external event (but not another actor!) should be declared 
+	as <span class="code">@Usage(ThreadUsage.Waiting)</span>. Both annotations will cause 
+	the agent to increase the thread pool's maximum size while the message is running. A 
+	message implementation should not mix costly CPU operations with IO or external events. 
+	Instead it should be splitted into several messages.
+</p>
+<p>
+	The following example shows an actor with an I/O-bound and a waiting message:
+</p>
+<pre>class SlowMessageActor extends Actor
+{
+    @Message
+    <span class="codeEm">@Usage(ThreadUsage.IO)</span>
+    public AsyncResult&lt;Void&gt; writeFile(String name, String content) throws Exception {
+        FileOutputStream fos = new FileOutputStream(name);
+        fos.write(content.getBytes());
+        fos.close();
+        return noResult();
+    }   
+
+    @Message
+    <span class="codeEm">@Usage(ThreadUsage.Waiting)</span>
+    public AsyncResult&lt;Void&gt; waitForKeyPrompt() throws Exception {
+        System.in.read();
+        return noResult();
+    }
+}
+</pre>
+
+<h2>10. Concurrency Model Annotations</h2>
+<p>
+	So far, in this tutorial it has always been said that an actor can only process one 
+	message at a time. This is the classic actor model, and also the default model in Actors 
+	Guild. However, in some cases a single actor can become a bottleneck. You should always 
+	consider to avoid this by distributing the work on several actor instances, but this is not 
+	always possible. For these cases Actors Guild allows you to change the concurrency model 
+	of the actor and allow several threads running at the same time in the same actor. The 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Model.html">@Model</a>
+	can be applied to an actor to change the concurrency model.
+</p>
+<p>
+	The safer of the two multi-threaded models is 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/ConcurrencyModel.html#Stateless">ConcurrencyModel.Stateless</a>. 
+	In Stateless actor classes all fields must be 'final', and 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Prop.html">@Prop</a>
+	annotated properties must be read-only. Their type must either be a primitive, String, extend the 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/Immutable.html">Immutable</a>
+	interface or be annotated with the
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/Shared.html">@Shared</a>
+	annotation. The latter should only be used with thread-safe classes such as JDBC's <span class="code">DataSource</span>.
+	  
+	As long as you adhere to these rules (and Actors Guild will refuse to create Stateless actors that violate them), 
+	it is safe to declare the concurrency model as Stateless, because without mutable 
+	fields there are no race conditions. The following actor is Stateless:
+</p>
+<pre><span class="codeEm">@Model(ConcurrencyModel.Stateless)</span>
+class MultiplicatorActor extends Actor
+{
+    @Message
+    public AsyncResult&lt;Integer&gt; mul(int a, int b) {
+        return result(a * b);
+    }   
+}
+</pre>
+<p>
+Stateless actors can be called like any other actor. From the perspective of the caller, the only difference is that the stateless 
+actor is able to process more than one message at a time.
+</p>
+<p>
+	The second multi-threaded model is the pure 
+	<a href="http://actorsguildframework.googlecode.com/svn/trunk/doc/javadocs/org/actorsguildframework/annotations/ConcurrencyModel.html#MultiThreaded">MultiThreaded</a>
+	model. When you use this, you are on your own. The framework will process MultiThreaded 
+	messages as soon as possible and not coordinate their execution with other messages. The 
+	order in which the messages are being processed is not defined and may be different from 
+	the order of queuing. The message implementation is also responsible for memory synchronization.
+	One way to achieve this is to synchronize on the actor instance, which is what the framework
+	does for all single-threaded message implementations. The problem with manual synchronization
+	is that this may block the executing thread for a long time, if you have long-running
+	single-threaded messages in the Actor, and the Agent may eventually run out of threads
+	if too many actors do this.  
+</p>
+	<div id="footer" style="font-size: smaller; margin-top: 100px">
+				Last update: 
+				2009-2-6
+		 		- 
+				<a href="/imprint.xhtml">Imprint</a></div></div></div></div></body></html>
